@@ -40,7 +40,7 @@ class ConnBtn():
         self.horario = timestamp
 
     # Informa o estado do modo de conexão (ativo: True; inativo: False)
-    def connState():
+    def connState(self):
         try:
             # Calcula diferença entre a hora atual e a hora do arquivo
             dif = int(datetime.timestamp(datetime.now()) - self.horario)
@@ -53,7 +53,7 @@ class ConnBtn():
         return False
         
     # Callback quando botao é pressionado
-    def reset():
+    def reset(self):
         if not connState():
             gravarHorario()        
             while not connState():

@@ -8,11 +8,11 @@ Created on Fri Nov 15 10:20:33 2019
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
 # -- importa conexao MQTT
-import conexaoMQTT
+from conexaoMQTT import ConexaoMQTT
 # -- importa controle do led power (Verde)
 from powerLed import PowerLed
 # -- importa controle de Temperatura
-import temperatura
+from temperatura import Temperatura
 # -- importa controle de nivel
 import nivel
 # -- importa temporizador
@@ -28,7 +28,7 @@ power_led = PowerLed()
 power_led.ligar()
 
 # Conecta ao Broker
-conexao = conexaoMQTT()
+conexao = ConexaoMQTT()
 
 if(not conexao.iniciar()):
     print("Erro de Conexão")
@@ -42,20 +42,19 @@ conexao.sub(conexao.client_id+"/atuadores/alimentacao")
 conexao.sub(conexao.client_id+"/conectar")
 
 # Inicia Threads dos sensores
-thrTemp = temperatura.tmpSensor(conexao)
+thrTemp = Temperatura(conexao)
 thrTemp.start()
-thrNivel = nivel.lvlSensor(conexao)
+thrNivel = Nivel(conexao)
 thrNivel.start()
-
 
 # Monitora se as threads de envio estão rodando
 while True:
     if not thrTemp.is_alive():
-        thrTemp = temperatura.tmpSensor(conexao)
+        thrTemp = Temperatura(conexao)
         thrTemp.start()
         
     if not thrNivel.is_alive():
-        thrNivel = nivel.lvlSensor(conexao)
+        thrNivel = Nivel(conexao)
         thrNivel.start()
     # Define o intervalo de 10s
     time.sleep(10)

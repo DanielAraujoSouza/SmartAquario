@@ -18,7 +18,7 @@ from bomba import Bomba
 # -- importa controle de iluminação
 from iluminacao import Iluminacao
 # -- importa controle de alimentação
-import alimentacao
+from alimentacao import Alimentacao
 # -- importa temporizador
 import time
 # -- importa bibioteca json
@@ -26,6 +26,12 @@ import json
 
 class ConexaoMQTT(mqtt.Client):
     def __init__(self):
+        # Variaveis de Conexão
+        self.broker = "44.227.11.98"
+        self.port = 1883
+        #self.usuario = ""
+        #self.senha = ""
+
         self.client_id = self.infoAquario.appId
         self.client = mqtt.Client(self.client_id)
         # Cria uma flag de conexão
@@ -41,14 +47,16 @@ class ConexaoMQTT(mqtt.Client):
         # Botão de conexão
         self.connBtn = ConnBtn()
         # Informações do aquario
-        infoAquario = InfoAquario()
+        self.infoAquario = InfoAquario()
         # Bomba de água (Relé)
-        bomba = Bomba() 
+        self.bomba = Bomba()
+        # Alimentacao
+        self.alimentacao = Alimentacao() 
 
     def on_connect(self, client, obj, flags, rc):
             if rc == 0:
                 # Conexão bem sucedida
-                self.client.connected_flag = True
+                self.connected_flag = True
                 # Liga led de conexão
                 self.connLed.ligar()
                 print("Conexão Estabelecida")
@@ -103,13 +111,13 @@ class ConexaoMQTT(mqtt.Client):
             # Topico alimentação
             elif topico == (self.infoAquario.appId+"/atuadores/alimentacao"):
                 if msg == "P":
-                    alimentacao.alimentar(1)
+                    self.alimentacao.alimentar(1)
                    
                 elif msg == "M":
-                    alimentacao.alimentar(2)
+                    self.alimentacao.alimentar(2)
                    
                 elif msg == "G":
-                    alimentacao.alimentar(3)
+                    self.alimentacao.alimentar(3)
 
     def on_publish(self, mqttc, obj, mid):
         print("mid: "+str(mid))
@@ -118,7 +126,8 @@ class ConexaoMQTT(mqtt.Client):
         print("Subscribed: "+str(mid)+" "+str(granted_qos))
 
     def on_log(self, client, userdata, level, buf):
-        print(buf)
+        if self.mqttclient_log:
+            print(buf)
 
     def iniciar(self):
         self.connect("mqtt.eclipse.org", 1883, 60)
@@ -137,131 +146,39 @@ class ConexaoMQTT(mqtt.Client):
         # Inicia um nova thread com o novo estado
         self.thrIlum = Iluminacao(modo)
         self.thrIlum.start()
+    def iniciar(self):
+        # Credenciais de acesso
+        #self.client.username_pw_set(username=usuario,password=senha) 
+        # Inicia o loop em uma nova Thread 
+        self.client.loop_start()
+        # Conecta ao Broker
+        client.connect(self.broker,self.port)
+        # Loop que aguarda a conexão
+        while not self.connected_flag:
+            print("Aguardando Conexão")
+            time.sleep(5)
+        return True
+   
+    def parar(self):
+        self.client.loop_stop()
+        self.client.disconnect()
+        if self.thrIlum.is_alive():
+            print("matando thread")
+            self.thrIlum.stop()
 
+    def sub(self,topico):
+        if self.connected_flag:
+            self.client.subscribe(topico,1)
+        else:
+            print("Falha de publicação: Sem conexão")
 
-#####################
-    
-def on_message(client, userdata, message):
-    # Objeto global da Thread de iluminação
-    global thrIlum
-    # Identificador do app vinculado ao aquário
-    global app_id
-    
-    topico = message.topic
-    payload = json.loads(str(message.payload.decode("utf-8")))
-    remetente = payload["APPID"]
-    msg = payload["MSG"]
-    
-    if topico == (self.infoAquario.appId+"/conectar"):
-        if connBtn.connState():
-            # Se o botao de conexão não foi pressionado a menos de 60s
-            pub(client_id+"/conectar/resposta", "ERRO")
-        elif remetente != "":
-            # Confirma conexão
-            pub(client_id+"/conectar/resposta", client_id)
-            # Grava id do app
-            aquario.appIdWrite(remetente)
-            # Remove horario do arquivo indicando que a conexão foi estabelecida
-            connBtn.removerHorario()
-            # Atualiza variavel do identificador do app vinculado ao aquário
-            app_id = remetente
-    # So aceita mensagens do app vinculado
-    elif app_id != "" and remetente == app_id:
-        # Topico para bomba (Relé)
-        if topico == (self.infoAquario.appId+"/atuadores/bomba"):
-            if msg == "ligar":
-                bomba.ligar()
-            elif msg == "desligar":
-                bomba.desligar()
-        
-        # Topico iluminação (Fita de Led)
-        elif topico == (self.infoAquario.appId+"/atuadores/iluminacao"):
-            cor = json.loads(msg)
-            if cor["MODO"] == "cor":
-                thrIlumState(cor["MODO"],cor["R"],cor["G"],cor["B"])
-               
-            elif cor["MODO"] == "especial":
-                thrIlumState(cor["MODO"],cor["TIPO"])
-                       
-        # Topico alimentação
-        elif topico == (self.infoAquario.appId+"/atuadores/alimentacao"):
-            if payload == "P":
-                alimentacao.alimentar(1)
-               
-            elif payload == "M":
-                alimentacao.alimentar(2)
-               
-            elif payload == "G":
-                alimentacao.alimentar(3)
-        
-def iniciar():
-    global client_id
-    global app_id
-    global connected_flag
-    # Variaveis de Conexão
-    broker_address = "44.227.11.98"
-    broker_port = 1883
-    #usuario = ""
-    #senha = ""
-
-    # Cria uma nova instancia sem sessão limpa
-    client = mqtt.Client(client_id,False)
-    # Credenciais de acesso
-    #client.username_pw_set(username=usuario,password=senha) 
-    # Ativa logs do CLiente
-    if mqttclient_log:
-        client.on_log=on_log
-        
-    # Callback conexão
-    client.on_connect = on_connect
-       
-    # Callback desconexão
-    client.on_disconnect = on_disconnect
-    # Callback de mensagens
-    client.on_message = on_message
-    # Inicia o loop em uma nova Thread 
-    client.loop_start()
-    # Conecta ao Broker
-    client.connect(broker_address,broker_port)
-    # Loop que aguarda a conexão
-    while not client.connected_flag:
-        print("Aguardando Conexão")
-        time.sleep(5)
-    return True
-
-def parar():
-    global thrIlum
-    client.loop_stop()
-    client.disconnect()
-    if thrIlum.is_alive():
-        print("matando thread")
-        thrIlum.stop()
-
-def sub(topico):
-    global connected_flag
-    if client.connected_flag:
-        client.subscribe(topico,1)
-    else:
-        print("Falha de publicação: Sem conexão")
-
-def pub (topico, msg):
-    global connected_flag
-    if client.connected_flag:
-        payload={"SAID":client_id,
-                 "MSG":msg
-                 }
-        client.publish(topico,json.dumps(payload))
-    else:
-        print("Falha de publicação: Sem conexão")
-# Cria uma flag de conexão
-mqtt.Client.connected_flag=False
-# Cria uma flag de desconexão
-mqtt.Client.disconnect_flag=False
-# -- Ativa logs
-mqttclient_log = False
-
-# Identificadores
-client_id = self.infoAquario.appId
-app_id = aquario.appId()
+    def pub (self,topico, msg):
+        if self.connected_flag:
+            payload = {"SAID":client_id,
+                       "MSG":msg
+                       }
+            self.client.publish(topico,json.dumps(payload))
+        else:
+            print("Falha de publicação: Sem conexão")
 
 

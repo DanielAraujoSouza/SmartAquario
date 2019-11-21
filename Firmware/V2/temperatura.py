@@ -12,7 +12,7 @@ import os
 import glob
 import time 
    
-class tmpSensor(threading.Thread): 
+class Temperatura(threading.Thread): 
     def __init__(self, conexao): 
         threading.Thread.__init__(self) 
         self.conexao = conexao

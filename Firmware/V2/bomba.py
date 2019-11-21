@@ -18,11 +18,11 @@ class Bomba():
         # -- Define pino como saida
         GPIO.setup(pin, GPIO.OUT)
     # -- Liga a bomba
-    def ligar():
+    def ligar(self):
         GPIO.output(self.pin, GPIO.HIGH)
         print("Bomba ligada")
         
     # -- Desdiga a bomba
-    def desligar():
+    def desligar(self):
         GPIO.output(self.pin, GPIO.LOW)
         print("Bomba Desligada")
