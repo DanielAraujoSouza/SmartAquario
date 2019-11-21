@@ -53,7 +53,7 @@ def reset():
             
 
 # Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BMC)
+GPIO.setmode(GPIO.BCM)
 
 # GPIO do botao conexão
 pin = 6

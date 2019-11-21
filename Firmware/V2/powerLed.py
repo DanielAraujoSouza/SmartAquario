@@ -7,7 +7,7 @@ Created on Fri Nov 15 10:22:26 2019
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
 # Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BMC)
+GPIO.setmode(GPIO.BCM)
 
 # GPIO do led power (Verde)
 pin = 12

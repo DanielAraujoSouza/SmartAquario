@@ -7,7 +7,7 @@ Created on Fri Nov 15 21:56:45 2019
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
 # Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BMC)
+GPIO.setmode(GPIO.BCM)
 
 # GPIO do rele que controla a bomba
 pin = 7
