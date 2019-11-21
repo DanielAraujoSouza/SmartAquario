@@ -52,11 +52,44 @@ class estado(threading.Thread):
             tipo = self.r
             print ("Iluminação dinâmica")
             if tipo == 1:    
-                while True:
-                    print ("a")
-                    time.sleep(0.5)
-                    print ("b")
-                    time.sleep(0.5)
+                # Variavies
+                dcBlue = 0
+                dcRed  = 0
+                dcGreen = 0
+
+                passo = 5
+                vel = 0.05
+                # Loop infinito
+                while True:                   
+                    while dcRed < 100:
+                        dcRed = dcRed + passo
+                        self.pwmRed.ChangeDutyCycle(dcRed)
+                        time.sleep(vel)
+                        
+                    while dcRed > 0:
+                        dcRed = dcRed - passo
+                        self.pwmRed.ChangeDutyCycle(dcRed)
+                        time.sleep(vel)
+                        
+                    while dcBlue < 100:
+                        dcBlue = dcBlue + passo
+                        self.pwmBlue.ChangeDutyCycle(dcBlue)
+                        time.sleep(vel)
+                        
+                    while dcBlue > 0:
+                        dcBlue = dcBlue - passo
+                        self.pwmBlue.ChangeDutyCycle(dcBlue)
+                        time.sleep(vel)
+                        
+                    while dcGreen < 100:
+                        dcGreen = dcGreen + passo
+                        self.pwmGreen.ChangeDutyCycle(dcGreen)
+                        time.sleep(vel)
+                        
+                    while dcGreen > 0:
+                        dcGreen = dcGreen - passo
+                        self.pwmGreen.ChangeDutyCycle(dcGreen)
+                        time.sleep(vel)
         # Desligado
         else:
             print ("Desligado")
@@ -73,6 +106,12 @@ class estado(threading.Thread):
                 return id
    
     def stop(self): 
+        # Desliga os leds
+        self.pwmBlue.start(0)
+        self.pwmRed.start(0)
+        self.pwmGreen.start(0)
+
+        # Para a Thread
         thread_id = self.get_id() 
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
               ctypes.py_object(SystemExit)) 
