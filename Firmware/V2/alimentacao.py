@@ -33,7 +33,7 @@ class Alimentacao():
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin,GPIO.OUT)
         self.pwm = GPIO.PWM(self.pin,f)
-        pwm.start(0)
+        self.pwm.start(0)
 
         # Calcula o ângulo a ser passado para o servo
         def set_angle(self,angle):

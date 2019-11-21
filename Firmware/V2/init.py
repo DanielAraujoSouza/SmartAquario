@@ -14,7 +14,7 @@ from powerLed import PowerLed
 # -- importa controle de Temperatura
 from temperatura import Temperatura
 # -- importa controle de nivel
-import nivel
+from nivel import Nivel
 # -- importa temporizador
 import time
 
@@ -49,6 +49,7 @@ thrNivel.start()
 
 # Monitora se as threads de envio estão rodando
 while True:
+    print("Monitorando...")
     if not thrTemp.is_alive():
         thrTemp = Temperatura(conexao)
         thrTemp.start()

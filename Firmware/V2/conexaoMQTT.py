@@ -24,16 +24,8 @@ import time
 # -- importa bibioteca json
 import json
 
-class ConexaoMQTT(mqtt.Client):
+class ConexaoMQTT():
     def __init__(self):
-        # Variaveis de Conexão
-        self.broker = "44.227.11.98"
-        self.port = 1883
-        #self.usuario = ""
-        #self.senha = ""
-
-        self.client_id = self.infoAquario.appId
-        self.client = mqtt.Client(self.client_id)
         # Cria uma flag de conexão
         self.connected_flag = False
         # Cria uma flag de desconexão
@@ -51,9 +43,25 @@ class ConexaoMQTT(mqtt.Client):
         # Bomba de água (Relé)
         self.bomba = Bomba()
         # Alimentacao
-        self.alimentacao = Alimentacao() 
+        self.alimentacao = Alimentacao()
+        
+        # Variaveis de Conexão
+        self.broker = "44.227.11.98"
+        self.port = 1883
+        #self.usuario = ""
+        #self.senha = ""
+        self.client_id = self.infoAquario.aquarioId
+        print(self.client_id)
+        self.client = mqtt.Client(self.client_id)
+        self.client.on_connect = self.on_connect
+        self.client.on_disconnect = self.on_disconnect
+        self.client.on_message = self.on_message
+        self.client.on_publish = self.on_publish
+        self.client.on_subscribe = self.on_subscribe
+        self.client.on_log = self.on_log
 
     def on_connect(self, client, obj, flags, rc):
+            print ("on")
             if rc == 0:
                 # Conexão bem sucedida
                 self.connected_flag = True
@@ -75,19 +83,31 @@ class ConexaoMQTT(mqtt.Client):
         
         topico = message.topic
         payload = json.loads(str(message.payload.decode("utf-8")))
+        print(payload)
         remetente = payload["APPID"]
         msg = payload["MSG"]
         
-        if topico == (self.infoAquario.appId+"/conectar"):
-            if self.connBtn.connState():
+        print ("topico: " + topico)
+        print ("remetente: " + remetente)
+        print ("msg: " + msg)
+        print("era pra ser" + self.client_id + "/conectar")
+        print(self.connBtn.connState())
+        
+        if topico == self.client_id+"/conectar":    
+            print("entif")            
+            if not self.connBtn.connState():
                 # Se o botao de conexão não foi pressionado a menos de 60s
-                pub(self.client_id+"/conectar/resposta", "ERRO")
+                print("connStateerro")
+                self.pub(remetente + "/conectar/resposta", "ERRO")
             elif remetente != "":
+                print("vai confirar")
                 # Confirma conexão
-                pub(self.client_id+"/conectar/resposta", client_id)
+                self.pub(remetente+"/conectar/resposta", self.client_id)
                 # Grava id do app
+                print ("vai gravar")
                 self.infoAquario.appIdWrite(remetente)
                 # Remove horario do arquivo indicando que a conexão foi estabelecida
+                print("remover horario")
                 self.connBtn.removerHorario()
 
         # So aceita mensagens do app vinculado
@@ -152,7 +172,7 @@ class ConexaoMQTT(mqtt.Client):
         # Inicia o loop em uma nova Thread 
         self.client.loop_start()
         # Conecta ao Broker
-        client.connect(self.broker,self.port)
+        self.client.connect(self.broker,self.port)
         # Loop que aguarda a conexão
         while not self.connected_flag:
             print("Aguardando Conexão")
@@ -173,11 +193,15 @@ class ConexaoMQTT(mqtt.Client):
             print("Falha de publicação: Sem conexão")
 
     def pub (self,topico, msg):
+        print("fpub")
+        print(self.connected_flag)
         if self.connected_flag:
-            payload = {"SAID":client_id,
+            payload = {"SAID":self.client_id,
                        "MSG":msg
                        }
-            self.client.publish(topico,json.dumps(payload))
+            print(payload)
+            self.client.publish(topico,json.dumps(payload),1)
+            print("publicou")
         else:
             print("Falha de publicação: Sem conexão")
 

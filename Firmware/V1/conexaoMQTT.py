@@ -41,7 +41,6 @@ def on_connect(client, userdata, flags, rc):
         # Liga led de conexão
         connLed.ligar()
         print("Conexão Estabelecida")
-
     else:
         print("Errod de conexão=",rc)
         

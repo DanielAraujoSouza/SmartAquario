@@ -16,7 +16,7 @@ class Bomba():
         # GPIO do rele que controla a bomba
         self.pin = 7
         # -- Define pino como saida
-        GPIO.setup(pin, GPIO.OUT)
+        GPIO.setup(self.pin, GPIO.OUT)
     # -- Liga a bomba
     def ligar(self):
         GPIO.output(self.pin, GPIO.HIGH)

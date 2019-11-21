@@ -8,7 +8,7 @@ Created on Fri Nov 15 19:18:12 2019
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
 # -- importa controle do led conexão (Azul)
-import connLed
+from connLed import ConnLed
 from datetime import datetime
 import time
 
@@ -19,10 +19,11 @@ class ConnBtn():
         # GPIO do botao conexão
         self.pin = 6
         # -- Define pino como entrada pull-up
-        GPIO.setup (pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.setup (self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         # Registra funcoes de callback apos 3s de botao pressionado
-        GPIO.add_event_detect(pin, GPIO.FALLING, callback=reset, bouncetime=3000)
+        GPIO.add_event_detect(self.pin, GPIO.FALLING, callback=self.reset, bouncetime=3000) 
         self.horario = ""
+        self.connLed = ConnLed()
 
     # Remove horario que o botao foi pressionado (Conexão estabelecida)
     def removerHorario(self):
@@ -53,13 +54,16 @@ class ConnBtn():
         return False
         
     # Callback quando botao é pressionado
-    def reset(self):
-        if not connState():
-            gravarHorario()        
-            while not connState():
-                connLed.desligar()
+    def reset(self,channel):
+        print("reset")
+        print(self.connState())
+        if not self.connState():
+            self.gravarHorario()   
+            print ("Gravou")     
+            while self.connState():
+                self.connLed.desligar()
                 time.sleep(0.3)
-                connLed.ligar()
+                self.connLed.ligar()
                 time.sleep(0.3)
             
 

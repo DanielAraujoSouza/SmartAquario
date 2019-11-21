@@ -30,7 +30,8 @@ class Temperatura(threading.Thread):
             valor = self.valor()
             print ("Temp: " + str(valor) + "\n")
             if valor != "":
-                self.conexao.pub(self.conexao.client_id+"/sensores/temperatura/valor",valor)        
+                #self.conexao.pub(self.conexao.client_id+"/sensores/temperatura/valor",valor)    
+                a = 1    
             # Define o intervalo envio
             time.sleep(self.delay)
         

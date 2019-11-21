@@ -5,8 +5,8 @@ Created on Fri Nov 15 10:33:11 2019
 @author: Daniel Araújo Chaves Souza
 """
 
-class infoAquario():
-  def __init__(self)
+class InfoAquario():
+  def __init__(self):
     # Cria um identificador unico para o dispositivo:
     cpuserial = "0000000000000000"
     try:
@@ -17,7 +17,7 @@ class infoAquario():
       f.close()
     except:
       cpuserial = "ERROR000000000"
-    self.aquarioId =  "SmarthAquario-"+str(cpuserial)
+    self.aquarioId =  "SmartAquario-"+str(cpuserial)
     
     # Identificador do app que esta conectado ao aquario
     try:
