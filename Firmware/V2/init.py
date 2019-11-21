@@ -19,8 +19,8 @@ import nivel
 import time
 
 ## Define parametro de gpio
-#GPIO.setwarnings(False)
-#GPIO.cleanup()
+GPIO.setwarnings(False)
+GPIO.cleanup()
 
 # Liga luz de power ON
 powerLed.ligar()
@@ -60,4 +60,5 @@ except:
     conexao.parar()
     thrTemp.stop()
     thrNivel.stop()
-#    exit()
+    GPIO.cleanup()
+    exit()

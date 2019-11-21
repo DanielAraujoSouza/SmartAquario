@@ -17,36 +17,34 @@ class estado(threading.Thread):
         self.r = r
         self.g = g
         self.b = b
-        #Configuring don’t show warnings 
-#        gpio.setwarnings(False)
         
         #Configuring GPIO
-#        pinBlue = 17
-#        pinRed = 24
-#        pinGreen = 27
-#        
-#        gpio.setmode(gpio.BCM)
-#        gpio.setup(pinBlue,gpio.OUT)
-#        gpio.setup(pinRed,gpio.OUT)
-#        gpio.setup(pinGreen,gpio.OUT)
+        pinBlue = 2
+        pinRed = 17
+        pinGreen = 3
+        
+        gpio.setmode(gpio.BCM)
+        gpio.setup(pinBlue,gpio.OUT)
+        gpio.setup(pinRed,gpio.OUT)
+        gpio.setup(pinGreen,gpio.OUT)
         
         #Configure the pwm objects and initialize its value
-#        self.pwmBlue = gpio.PWM(pinBlue,120)
-#        self.pwmBlue.start(0)
-#        
-#        self.pwmRed = gpio.PWM(pinRed,120)
-#        self.pwmRed.start(0)
-#        
-#        self.pwmGreen = gpio.PWM(pinGreen,120)
-#        self.pwmGreen.start(0)
+        self.pwmBlue = gpio.PWM(pinBlue,120)
+        self.pwmBlue.start(0)
+        
+        self.pwmRed = gpio.PWM(pinRed,120)
+        self.pwmRed.start(0)
+        
+        self.pwmGreen = gpio.PWM(pinGreen,120)
+        self.pwmGreen.start(0)
         
     def run(self): 
         # Iluminação estatica
         if self.tipo == "cor":
             print ("Iluminação Estatica")
-#            self.pwmRed.ChangeDutyCycle(self.r)
-#            self.pwmGreen.ChangeDutyCycle(self.g)
-#            self.pwmBlue.ChangeDutyCycle(self.b)
+            self.pwmRed.ChangeDutyCycle(self.r)
+            self.pwmGreen.ChangeDutyCycle(self.g)
+            self.pwmBlue.ChangeDutyCycle(self.b)
 
         # Iluminação dinâmica
         elif self.modo == "especial":
@@ -62,9 +60,9 @@ class estado(threading.Thread):
         # Desligado
         else:
             print ("Desligado")
-#            self.pwmBlue.ChangeDutyCycle(0)
-#            self.pwmRed.ChangeDutyCycle(0)
-#            self.pwmGreen.ChangeDutyCycle(0)
+            self.pwmBlue.ChangeDutyCycle(0)
+            self.pwmRed.ChangeDutyCycle(0)
+            self.pwmGreen.ChangeDutyCycle(0)
            
     def get_id(self): 
         # returns id of the respective thread 

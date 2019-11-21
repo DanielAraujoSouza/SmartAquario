@@ -111,6 +111,7 @@ def on_message(client, userdata, message):
                 alimentacao.alimentar(3)
         
 def iniciar():
+    # Inicia o loop em uma nova Thread 
     client.loop_start()
     # Conecta ao Broker
     client.connect(broker_address,broker_port)
@@ -153,8 +154,8 @@ broker_address = "localhost"
 broker_port = 1883
 client_id = aquario.id()
 app_id = aquario.appId()
-usuario = ""
-senha = ""
+#usuario = ""
+#senha = ""
 
 # Cria uma nova instancia sem sessão limpa
 client = mqtt.Client(client_id,False)
@@ -174,4 +175,3 @@ except:
 client.on_disconnect = on_disconnect
 # Callback de mensagens
 client.on_message = on_message
-# Inicia o loop em uma nova Thread 

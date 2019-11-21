@@ -15,11 +15,11 @@ class lvlSensor(threading.Thread):
         threading.Thread.__init__(self) 
         self.conexao = conexao
         self.delay = 30
-#        # Configurando os GPIO
-#        GPIO.setmode (GPIO.BCM)
-#        pin = 13
-#        # -- Define como pull-up
-#        GPIO.setup (pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
+        # Configurando os GPIO
+        GPIO.setmode (GPIO.BCM)
+        pin = 13
+        # -- Define como pull-up
+        GPIO.setup (pin, GPIO.IN, pull_up_down=GPIO.PUD_UP) 
     
     def run(self): 
         while True:
@@ -31,8 +31,7 @@ class lvlSensor(threading.Thread):
             time.sleep(self.delay)
 
     def valor(self ):
-#        return GPIO.input(pin)
-        return 1
+        return GPIO.input(pin)
 
     def get_id(self): 
         # returns id of the respective thread 
