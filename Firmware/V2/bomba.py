@@ -6,19 +6,23 @@ Created on Fri Nov 15 21:56:45 2019
 """
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
-# Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BCM)
 
-# GPIO do rele que controla a bomba
-pin = 7
-# -- Define pino como saida
-GPIO.setup(pin, GPIO.OUT)
-# -- Liga a bomba
-def ligar():
-    GPIO.output(pin, GPIO.HIGH)
-    print("Bomba ligada")
-    
-# -- Desdiga a bomba
-def desligar():
-    GPIO.output(pin, GPIO.LOW)
-    print("Bomba Desligada")
+class Bomba():
+    def __init__(self):
+        # Desabilita avisos
+        GPIO.setwarnings(False)
+        # Modo de numeração do pinos: GPIO
+        GPIO.setmode(GPIO.BCM)
+        # GPIO do rele que controla a bomba
+        self.pin = 7
+        # -- Define pino como saida
+        GPIO.setup(pin, GPIO.OUT)
+    # -- Liga a bomba
+    def ligar():
+        GPIO.output(self.pin, GPIO.HIGH)
+        print("Bomba ligada")
+        
+    # -- Desdiga a bomba
+    def desligar():
+        GPIO.output(self.pin, GPIO.LOW)
+        print("Bomba Desligada")

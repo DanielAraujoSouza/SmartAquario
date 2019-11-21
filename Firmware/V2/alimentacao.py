@@ -8,6 +8,15 @@ Created on Sat Nov 16 17:29:53 2019
 import RPi.GPIO as GPIO
 import time
 
+class Alimentacao():
+    def __init__(self):
+        # GPIO do servo que controlar o alimentador
+        self.pin = 18
+        #Iniciar o pino gpio
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.pin,GPIO.OUT)
+        self.pwm = GPIO.PWM(self.pin,f)
+        pwm.start(0)
 ## GPIO do servo que controlar o alimentador
 pin = 18
 
@@ -25,8 +34,8 @@ duty_range = pulse_range * k
 
 #Iniciar o pino gpio
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(servo_pin,GPIO.OUT)
-pwm = GPIO.PWM(servo_pin,f)
+GPIO.setup(pin,GPIO.OUT)
+pwm = GPIO.PWM(pin,f)
 pwm.start(0)
 
 # Calcula o ângulo a ser passado para o servo

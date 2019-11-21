@@ -5,12 +5,12 @@ Created on Sat Nov 16 10:51:51 2019
 @author: Daniel Araújo Chaves Souza
 """
 #Define Libraries
-#import RPi.GPIO as gpio
+import RPi.GPIO as gpio
 import threading 
 import ctypes
 import time 
    
-class estado(threading.Thread): 
+class Iluminacao(threading.Thread): 
     def __init__(self, tipo,r="",g="",b=""): 
         threading.Thread.__init__(self) 
         self.tipo = tipo

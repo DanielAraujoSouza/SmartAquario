@@ -50,7 +50,7 @@ class tmpSensor(threading.Thread):
             temp_string = lines[1][equals_pos+2:]
             temp_c = float(temp_string)/1000.0
             return temp_c
-        elif:
+        else:
             return ""
     
     def get_id(self): 

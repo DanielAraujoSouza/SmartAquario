@@ -12,54 +12,54 @@ import connLed
 from datetime import datetime
 import time
 
-# Remove horario que o botao foi pressionado (Conexão estabelecida)
-def removerHorario():
-    arquivo = open('btnTime.asa', 'w')
-    arquivo.write("")
-    arquivo.close()
-    
-# Grava horario que o botao foi pressionado
-def gravarHorario():
-    timestamp = int(datetime.timestamp(datetime.now()))
-    arquivo = open('btnTime.asa', 'w')
-    arquivo.write(str(timestamp))
-    arquivo.close()
+class ConnBtn():
+    def __init__(self):
+        # Modo de numeração do pinos: GPIO
+        GPIO.setmode(GPIO.BCM)
+        # GPIO do botao conexão
+        self.pin = 6
+        # -- Define pino como entrada pull-up
+        GPIO.setup (pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        # Registra funcoes de callback apos 3s de botao pressionado
+        GPIO.add_event_detect(pin, GPIO.FALLING, callback=reset, bouncetime=3000)
+        self.horario = ""
 
-# Informa o estado do modo de conexão (ativo: True; inativo: False)
-def connState():
-    try:
-        arquivo = open('btnTime.asa', 'r')
-        valor = int(arquivo.readline().strip())
+    # Remove horario que o botao foi pressionado (Conexão estabelecida)
+    def removerHorario(self):
+        arquivo = open('btnTime.asa', 'w')
+        arquivo.write("")
         arquivo.close()
-        # Calcula diferença entre a hora atual e a hora do arquivo
-        dif = int(datetime.timestamp(datetime.now()) - valor)
+        self.horario = ""
         
-        if dif <= 60:
-            return True
-    except:
-        pass
+    # Grava horario que o botao foi pressionado
+    def gravarHorario(self):
+        timestamp = int(datetime.timestamp(datetime.now()))
+        arquivo = open('btnTime.asa', 'w')
+        arquivo.write(str(timestamp))
+        arquivo.close()
+        self.horario = timestamp
 
-    return False
-    
-# Callback quando botao é pressionado
-def reset():
-    if not connState():
-        gravarHorario()        
-        while not connState():
-            connLed.desligar()
-            time.sleep(0.3)
-            connLed.ligar()
-            time.sleep(0.3)
+    # Informa o estado do modo de conexão (ativo: True; inativo: False)
+    def connState():
+        try:
+            # Calcula diferença entre a hora atual e a hora do arquivo
+            dif = int(datetime.timestamp(datetime.now()) - self.horario)
+            # Se menor que 60 aquario aceita conexão
+            if dif <= 60:
+                return True
+        except:
+            pass
+
+        return False
+        
+    # Callback quando botao é pressionado
+    def reset():
+        if not connState():
+            gravarHorario()        
+            while not connState():
+                connLed.desligar()
+                time.sleep(0.3)
+                connLed.ligar()
+                time.sleep(0.3)
             
 
-# Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BCM)
-
-# GPIO do botao conexão
-pin = 6
-
-# -- Define pino como entrada pull-up
-GPIO.setup (pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# Registra funcoes de callback apos 3s de botao pressionado
-GPIO.add_event_detect(pin, GPIO.FALLING, callback=reset, bouncetime=3000)

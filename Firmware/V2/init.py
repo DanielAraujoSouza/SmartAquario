@@ -6,11 +6,11 @@ Created on Fri Nov 15 10:20:33 2019
 """
 # Imports
 # -- importa a biblioteca de acesso aos pinos 
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 # -- importa conexao MQTT
-import conexaoMQTT as conexao
+import conexaoMQTT
 # -- importa controle do led power (Verde)
-import powerLed
+from powerLed import PowerLed
 # -- importa controle de Temperatura
 import temperatura
 # -- importa controle de nivel
@@ -22,10 +22,14 @@ import time
 GPIO.setwarnings(False)
 GPIO.cleanup()
 
+#try:
 # Liga luz de power ON
-powerLed.ligar()
+power_led = PowerLed()
+power_led.ligar()
 
 # Conecta ao Broker
+conexao = conexaoMQTT()
+
 if(not conexao.iniciar()):
     print("Erro de Conexão")
     conexao.parar()
@@ -43,22 +47,26 @@ thrTemp.start()
 thrNivel = nivel.lvlSensor(conexao)
 thrNivel.start()
 
+
 # Monitora se as threads de envio estão rodando
+while True:
+    if not thrTemp.is_alive():
+        thrTemp = temperatura.tmpSensor(conexao)
+        thrTemp.start()
+        
+    if not thrNivel.is_alive():
+        thrNivel = nivel.lvlSensor(conexao)
+        thrNivel.start()
+    # Define o intervalo de 10s
+    time.sleep(10)
+#except:
+print ("Encerrando...")
+GPIO.cleanup()
+conexao.parar()
 try:
-    while True:
-        if not thrTemp.is_alive():
-            thrTemp = temperatura.tmpSensor(conexao)
-            thrTemp.start()
-            
-        if not thrNivel.is_alive():
-            thrNivel = nivel.lvlSensor(conexao)
-            thrNivel.start()
-        # Define o intervalo de 10s
-        time.sleep(10)
-except:
-    print ("Encerrando...")
-    conexao.parar()
     thrTemp.stop()
     thrNivel.stop()
-    GPIO.cleanup()
-    exit()
+except:
+    pass
+       
+#    exit()

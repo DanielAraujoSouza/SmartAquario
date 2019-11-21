@@ -6,18 +6,24 @@ Created on Fri Nov 15 10:22:26 2019
 """
 # -- importa a biblioteca de acesso aos pinos 
 import RPi.GPIO as GPIO
-# Modo de numeração do pinos: GPIO
-GPIO.setmode(GPIO.BCM)
 
-# GPIO do led power (Verde)
-pin = 12
-# -- Define pino como saida
-GPIO.setup(pin, GPIO.OUT)
-# -- Liga o Led
-def ligar():
-    GPIO.output(pin, GPIO.HIGH)
-    print("powerLed ON")
-# -- desdiga o Led
-def desligar():
-    GPIO.output(pin, GPIO.LOW)
-    print("powerLed OFF")
+class PowerLed():
+    def __init__(self): 
+        # Desabilita avisos
+        GPIO.setwarnings(False)
+        # Modo de numeração do pinos: GPIO
+        GPIO.setmode(GPIO.BCM)
+        # GPIO do led power (Verde)
+        self.pin = 12
+        # -- Define pino como saida
+        GPIO.setup(self.pin, GPIO.OUT)
+
+    # -- Liga o Led
+    def ligar(self):
+        GPIO.output(self.pin, GPIO.HIGH)
+        print("powerLed ON")
+
+    # -- desdiga o Led
+    def desligar(self):
+        GPIO.output(self.pin, GPIO.LOW)
+        print("powerLed OFF")
