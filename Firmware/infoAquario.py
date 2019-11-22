@@ -34,5 +34,16 @@ class InfoAquario():
           arquivo.write(str(id))
           arquivo.close()
           self.appId = str(id)
+          print("deu bom")
       except:
+          print("deu ruim")
           self.appId = ""
+      
+  def getAppID(self):
+    try:
+      arquivo = open('appid.asa', 'r')
+      self.appId = arquivo.readline().strip()
+      arquivo.close()
+    except:
+      self.appId = ""
+    return self.appId

@@ -9,6 +9,8 @@ Created on Fri Nov 15 19:18:12 2019
 import RPi.GPIO as GPIO
 # -- importa controle do led conexão (Azul)
 from connLed import ConnLed
+# -- importa informaçõe do aquario
+from infoAquario import InfoAquario
 from datetime import datetime
 import time
 
@@ -21,21 +23,22 @@ class ConnBtn():
         # -- Define pino como entrada pull-up
         GPIO.setup (self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         # Registra funcoes de callback apos 3s de botao pressionado
-        GPIO.add_event_detect(self.pin, GPIO.FALLING, callback=self.reset, bouncetime=3000) 
+        GPIO.add_event_detect(self.pin, GPIO.RISING, callback=self.reset, bouncetime=200) 
         self.horario = ""
         self.connLed = ConnLed()
+        self.infoAquario = InfoAquario()
 
     # Remove horario que o botao foi pressionado (Conexão estabelecida)
     def removerHorario(self):
-        arquivo = open('btnTime.asa', 'w')
+        self.horario = ""
+        arquivo = open('btntime.asa', 'w')
         arquivo.write("")
         arquivo.close()
-        self.horario = ""
         
     # Grava horario que o botao foi pressionado
     def gravarHorario(self):
         timestamp = int(datetime.timestamp(datetime.now()))
-        arquivo = open('btnTime.asa', 'w')
+        arquivo = open('btntime.asa', 'w')
         arquivo.write(str(timestamp))
         arquivo.close()
         self.horario = timestamp
@@ -65,5 +68,8 @@ class ConnBtn():
                 time.sleep(0.3)
                 self.connLed.ligar()
                 time.sleep(0.3)
+            
+            if self.infoAquario.getAppID() == "":
+                self.connLed.desligar()
             
 

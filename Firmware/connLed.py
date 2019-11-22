@@ -17,6 +17,7 @@ class ConnLed():
         self.pin = 5
         # -- Define pino como saida
         GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.LOW)
 
     # -- Liga o Led
     def ligar(self):

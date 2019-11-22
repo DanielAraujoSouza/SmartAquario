@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Nov 16 10:51:51 2019
-
 @author: Daniel Araújo Chaves Souza
 """
 #Define Libraries
@@ -11,9 +10,9 @@ import ctypes
 import time 
    
 class Iluminacao(threading.Thread): 
-    def __init__(self, tipo,r="",g="",b=""): 
+    def __init__(self, tipo,r="0",g="0",b="0"): 
         threading.Thread.__init__(self) 
-        self.tipo = tipo
+        self.modo = tipo
         self.r = r
         self.g = g
         self.b = b
@@ -38,20 +37,21 @@ class Iluminacao(threading.Thread):
         self.pwmGreen = gpio.PWM(pinGreen,120)
         self.pwmGreen.start(0)
         
+        
     def run(self): 
         # Iluminação estatica
-        if self.tipo == "cor":
+        if self.modo == "cor":
             print ("Iluminação Estatica")
-            self.pwmRed.ChangeDutyCycle(self.r)
-            self.pwmGreen.ChangeDutyCycle(self.g)
-            self.pwmBlue.ChangeDutyCycle(self.b)
+            self.pwmRed.ChangeDutyCycle(int(self.r))
+            self.pwmGreen.ChangeDutyCycle(int(self.g))
+            self.pwmBlue.ChangeDutyCycle(int(self.b))
 
         # Iluminação dinâmica
         elif self.modo == "especial":
             # Tipo de ilumição especial
             tipo = self.r
             print ("Iluminação dinâmica")
-            if tipo == 1:    
+            if tipo == "transicao":    
                 # Variavies
                 dcBlue = 0
                 dcRed  = 0
@@ -107,10 +107,10 @@ class Iluminacao(threading.Thread):
    
     def stop(self): 
         # Desliga os leds
-        self.pwmBlue.start(0)
-        self.pwmRed.start(0)
-        self.pwmGreen.start(0)
-
+        self.pwmBlue.stop()
+        self.pwmRed.stop()
+        self.pwmGreen.stop()
+        
         # Para a Thread
         thread_id = self.get_id() 
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 
@@ -118,5 +118,6 @@ class Iluminacao(threading.Thread):
         if res > 1: 
             ctypes.pythonapi.PyThreadState_SetAsyncExc(thread_id, 0) 
             print('Exception raise failure') 
-       
 
+    
+        

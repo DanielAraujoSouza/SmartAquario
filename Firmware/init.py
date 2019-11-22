@@ -24,9 +24,10 @@ GPIO.cleanup()
 
 #try:
 # Liga luz de power ON
+print("aqui")
 power_led = PowerLed()
 power_led.ligar()
-
+print("aqui2")
 # Conecta ao Broker
 conexao = ConexaoMQTT()
 

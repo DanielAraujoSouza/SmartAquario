@@ -17,6 +17,7 @@ class PowerLed():
         self.pin = 12
         # -- Define pino como saida
         GPIO.setup(self.pin, GPIO.OUT)
+        GPIO.output(self.pin, GPIO.LOW)
 
     # -- Liga o Led
     def ligar(self):
@@ -27,3 +28,4 @@ class PowerLed():
     def desligar(self):
         GPIO.output(self.pin, GPIO.LOW)
         print("powerLed OFF")
+

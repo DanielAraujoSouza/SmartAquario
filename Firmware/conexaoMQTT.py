@@ -52,7 +52,7 @@ class ConexaoMQTT():
         #self.senha = ""
         self.client_id = self.infoAquario.aquarioId
         print(self.client_id)
-        self.client = mqtt.Client(self.client_id)
+        self.client = mqtt.Client(self.client_id, clean_session = False)
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         self.client.on_message = self.on_message
@@ -61,17 +61,20 @@ class ConexaoMQTT():
         self.client.on_log = self.on_log
 
     def on_connect(self, client, obj, flags, rc):
-            print ("on")
-            if rc == 0:
-                # Conexão bem sucedida
-                self.connected_flag = True
-                # Liga led de conexão
+        print ("on")
+        if rc == 0:
+            # Conexão bem sucedida
+            self.connected_flag = True
+            # Liga led de conexão
+            if(self.infoAquario.appId != "" ):
                 self.connLed.ligar()
-                print("Conexão Estabelecida")
-
             else:
                 self.connLed.desligar()
-                print("Errod de conexão=",rc)
+            print("Conexão Estabelecida")
+
+        else:
+            self.connLed.desligar()
+            print("Errod de conexão=",rc)
 
     def on_disconnect(self, client, userdata, rc):
         print("motivo da desconexão" + str (rc))
@@ -80,7 +83,7 @@ class ConexaoMQTT():
         self.disconnect_flag = True
 
     def on_message(self, client, userdata, message):
-        
+        print("chegou")
         topico = message.topic
         payload = json.loads(str(message.payload.decode("utf-8")))
         print(payload)
@@ -109,28 +112,42 @@ class ConexaoMQTT():
                 # Remove horario do arquivo indicando que a conexão foi estabelecida
                 print("remover horario")
                 self.connBtn.removerHorario()
+                self.connLed.ligar()
+                print("final")
 
         # So aceita mensagens do app vinculado
         elif self.infoAquario.appId != "" and remetente == self.infoAquario.appId:
+            print("App id:" + self.infoAquario.appId+remetente)
             # Topico para bomba (Relé)
-            if topico == (self.infoAquario.appId+"/atuadores/bomba"):
+            if topico == (self.client_id+"/atuadores/bomba"):
+                print ("Bomba" + msg)
                 if msg == "ligar":
+                    print("A bomba vai ligar")
                     self.bomba.ligar()
+                    print("A bomba ligou")
                 elif msg == "desligar":
                     self.bomba.desligar()
             
             # Topico iluminação (Fita de Led)
-            elif topico == (self.infoAquario.appId+"/atuadores/iluminacao"):
-                cor = json.loads(msg)
-                if cor["MODO"] == "cor":
-                    self.thrIlumState(cor["MODO"],cor["R"],cor["G"],cor["B"])
+            elif topico == (self.client_id+"/atuadores/iluminacao"):
+                print("iluminacao")
+                if payload["MSG"] == "cor":
+                    print("estativa")
+                    self.thrIlumIniciar(payload["MSG"],payload["R"],payload["G"],payload["B"])
                    
-                elif cor["MODO"] == "especial":
-                    self.thrIlumState(cor["MODO"],cor["TIPO"])
+                elif payload["MSG"] == "especial":
+                    print("dinamica")
+                    self.thrIlumIniciar(payload["MSG"],payload["TIPO"])
+                
+                elif payload["MSG"] == "desligar":
+                    print("dinamica")
+                    self.thrIlumIniciar(payload["MSG"],payload["TIPO"])
                            
             # Topico alimentação
-            elif topico == (self.infoAquario.appId+"/atuadores/alimentacao"):
+            elif topico == (self.client_id+"/atuadores/alimentacao"):
+                print("Alimentacao")
                 if msg == "P":
+                    print("P")
                     self.alimentacao.alimentar(1)
                    
                 elif msg == "M":
@@ -158,14 +175,20 @@ class ConexaoMQTT():
             rc = self.loop()
         return rc
 
-    def thrIlumState(self, modo,r="",g="",b=""):
-        # Para a thread se ela estiver executando
-        if self.thrIlum.is_alive():
-            print("Parando thrIlum")
-            self.thrIlum.stop()
-        # Inicia um nova thread com o novo estado
-        self.thrIlum = Iluminacao(modo)
+    def thrIlumIniciar(self, modo,r="",g="",b=""):
+        print("func thrIlumState")
+        # Para a thread
+        self.thrIlum.stop()
+        # Deleta objeto
+        time.sleep(0.05)
+        del self.thrIlum
+        # Configura a thread com o novo estado
+        print("Criando thrIlum")
+        self.thrIlum = Iluminacao(modo,r,g,b)
+        print("Iniciando thrIlum")
         self.thrIlum.start()
+        print("thrIlum iniciada")
+        
     def iniciar(self):
         # Credenciais de acesso
         #self.client.username_pw_set(username=usuario,password=senha) 
