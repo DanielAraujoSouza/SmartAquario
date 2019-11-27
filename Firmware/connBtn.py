@@ -49,12 +49,13 @@ class ConnBtn():
             # Calcula diferença entre a hora atual e a hora do arquivo
             dif = int(datetime.timestamp(datetime.now()) - self.horario)
             # Se menor que 60 aquario aceita conexão
-            if dif <= 60 and dif >= 0:
+            print(dif)
+            if dif <= 60 and self.horario >= 0:
                 return True
+            else:
+                return False
         except:
-            pass
-
-        return False
+            return False        
         
     # Callback quando botao é pressionado
     def reset(self,channel):
