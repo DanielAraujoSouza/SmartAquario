@@ -24,13 +24,13 @@ class ConnBtn():
         GPIO.setup (self.pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         # Registra funcoes de callback apos 3s de botao pressionado
         GPIO.add_event_detect(self.pin, GPIO.RISING, callback=self.reset, bouncetime=200) 
-        self.horario = ""
+        self.horario = 0
         self.connLed = ConnLed()
         self.infoAquario = InfoAquario()
 
     # Remove horario que o botao foi pressionado (Conexão estabelecida)
     def removerHorario(self):
-        self.horario = ""
+        self.horario = 0
         arquivo = open('btntime.asa', 'w')
         arquivo.write("")
         arquivo.close()
@@ -49,7 +49,7 @@ class ConnBtn():
             # Calcula diferença entre a hora atual e a hora do arquivo
             dif = int(datetime.timestamp(datetime.now()) - self.horario)
             # Se menor que 60 aquario aceita conexão
-            if dif <= 60:
+            if dif <= 60 and dif >= 0:
                 return True
         except:
             pass
